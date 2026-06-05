@@ -1,0 +1,16 @@
+WITH monthly_activity AS (
+    SELECT DISTINCT
+        user_id,
+        DATE_TRUNC('month', event_date) AS month_start
+    FROM user_actions
+)
+
+SELECT
+    EXTRACT(MONTH FROM curr.month_start) AS month,
+    COUNT(DISTINCT curr.user_id) AS mau
+FROM monthly_activity curr
+JOIN monthly_activity prev
+    ON curr.user_id = prev.user_id
+   AND curr.month_start = prev.month_start + INTERVAL '1 month'
+WHERE curr.month_start = DATE '2022-07-01'
+GROUP BY 1;
